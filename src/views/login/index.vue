@@ -16,6 +16,17 @@
           placeholder="password"></el-input>
           <span class="show-pwd" @click="showPwd"><svg-icon icon-class="eye" /></span>
       </el-form-item>
+      <el-form-item prop="captcha">
+              <el-row :gutter="20">
+                <el-col :span="14">
+                  <el-input v-model="loginForm.captcha" placeholder="验证码">
+                  </el-input>
+                </el-col>
+                <el-col :span="10" class="login-captcha">
+                  <img :src="captchaPath" @click="getCaptcha()" alt="">
+                </el-col>
+              </el-row>
+            </el-form-item>
       <el-form-item>
         <el-button type="primary" style="width:100%;" :loading="loading" @click.native.prevent="handleLogin">
           Sign in
@@ -31,7 +42,7 @@
 
 <script>
 import { isvalidUsername } from '@/utils/validate'
-
+import { getUUID } from '@/utils'
 export default {
   name: 'login',
   data() {
@@ -52,15 +63,21 @@ export default {
     return {
       loginForm: {
         username: 'admin',
-        password: 'admin'
+        password: 'admin',
+        captcha: '',
+        uuid: ''
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
         password: [{ required: true, trigger: 'blur', validator: validatePass }]
       },
       loading: false,
-      pwdType: 'password'
+      pwdType: 'password',
+      captchaPath: ''
     }
+  },
+  created () {
+    this.getCaptcha()
   },
   methods: {
     showPwd() {
@@ -85,6 +102,12 @@ export default {
           return false
         }
       })
+    },
+    // 获取验证码
+    getCaptcha() {
+      this.loginForm.uuid = getUUID()
+      this.captchaPath = '/captcha.jpg?uuid=' + this.loginForm.uuid
+      alert(this.loginForm.uuid)
     }
   }
 }
